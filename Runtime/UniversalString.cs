@@ -4,105 +4,143 @@ using UnityEngine;
 namespace AnkleBreaker.Utils.UniversalTypes
 {
     /// <summary>
-    /// Universal string type that supports plain text, i2Localize terms, and Unity Localization entries.
-    /// Available modes depend on which localization packages are installed in the project.
+    /// Universal string that supports plain text and localization.
+    /// When a localization package is installed (I2Localize or Unity Localization),
+    /// a toggle appears in the Inspector to switch between plain text and localized term.
+    /// I2Localize takes priority over Unity Localization if both are present.
+    /// ToString() resolves the localized value automatically.
     /// </summary>
     [Serializable]
     public class UniversalString
     {
-        public enum StringMode
-        {
-            PlainText = 0,
-#if AB_I2_LOCALIZE
-            I2Localize = 1,
+#if AB_I2_LOCALIZE || AB_UNITY_LOCALIZATION
+        [SerializeField] private bool isLocalized;
 #endif
-#if AB_UNITY_LOCALIZATION
-            UnityLocalization = 2,
-#endif
-        }
-
-        [SerializeField] private StringMode mode = StringMode.PlainText;
         [SerializeField] private string plainText = "";
 
 #if AB_I2_LOCALIZE
-        [SerializeField] private string i2Term = "";
+        [SerializeField] private string localizedTerm = "";
+#elif AB_UNITY_LOCALIZATION
+        [SerializeField] private UnityEngine.Localization.LocalizedString localizedString;
 #endif
-
-#if AB_UNITY_LOCALIZATION
-        [SerializeField] private string locTableName = "";
-        [SerializeField] private string locEntryKey = "";
-#endif
-
         // ─── Properties ─────────────────────────────────────────────
 
-        public StringMode Mode => mode;
-        public string PlainText => plainText;
-
-#if AB_I2_LOCALIZE
-        /// <summary>i2Localize term key (e.g. "UI/MainMenu/Title").</summary>
-        public string I2Term => i2Term;
-#endif
-
-#if AB_UNITY_LOCALIZATION
-        /// <summary>Unity Localization table name (e.g. "UI Strings").</summary>
-        public string LocalizationTableName => locTableName;
-
-        /// <summary>Unity Localization entry key (e.g. "MAIN_MENU_TITLE").</summary>
-        public string LocalizationEntryKey => locEntryKey;
-#endif
-
-        // ─── Convenience ────────────────────────────────────────────
-
-        /// <summary>
-        /// Returns the raw stored value based on the current mode.
-        /// For localized modes, returns the term/key. Use your localization API to resolve.
-        /// </summary>
-        public string GetRawValue()
+        /// <summary>True if this string is in localized mode.</summary>
+        public bool IsLocalized
         {
-            switch (mode)
+            get
             {
-                case StringMode.PlainText:
-                    return plainText;
-#if AB_I2_LOCALIZE
-                case StringMode.I2Localize:
-                    return i2Term;
+#if AB_I2_LOCALIZE || AB_UNITY_LOCALIZATION
+                return isLocalized;
+#else
+                return false;
 #endif
-#if AB_UNITY_LOCALIZATION
-                case StringMode.UnityLocalization:
-                    return locEntryKey;
-#endif
-                default:
-                    return plainText;
             }
         }
 
-        /// <summary>
-        /// Returns true if the stored value for the current mode is null or empty.
-        /// </summary>
+        /// <summary>The plain text value (used when not localized).</summary>
+        public string PlainText => plainText;
+
+#if AB_I2_LOCALIZE
+        /// <summary>The I2Localize term key.</summary>
+        public string LocalizedTerm => localizedTerm;
+#elif AB_UNITY_LOCALIZATION
+        /// <summary>The Unity Localization LocalizedString reference.</summary>
+        public UnityEngine.Localization.LocalizedString LocalizedString => localizedString;
+#endif
+        /// <summary>True if the current value is null or empty.</summary>
         public bool IsEmpty
         {
             get
             {
-                switch (mode)
-                {
-                    case StringMode.PlainText:
-                        return string.IsNullOrEmpty(plainText);
 #if AB_I2_LOCALIZE
-                    case StringMode.I2Localize:
-                        return string.IsNullOrEmpty(i2Term);
+                if (isLocalized) return string.IsNullOrEmpty(localizedTerm);
+#elif AB_UNITY_LOCALIZATION
+                if (isLocalized) return localizedString == null || localizedString.IsEmpty;
 #endif
-#if AB_UNITY_LOCALIZATION
-                    case StringMode.UnityLocalization:
-                        return string.IsNullOrEmpty(locEntryKey);
-#endif
-                    default:
-                        return true;
-                }
+                return string.IsNullOrEmpty(plainText);
             }
         }
 
-        public override string ToString() => GetRawValue();
+        // ─── Resolution ─────────────────────────────────────────────
 
-        public static implicit operator string(UniversalString us) => us?.GetRawValue();
+        /// <summary>
+        /// Resolves and returns the string value.
+        /// For localized mode: I2Localize resolves via reflection, Unity Localization via API.
+        /// Falls back to raw term/key if translation fails.
+        /// </summary>
+        public override string ToString()
+        {
+#if AB_I2_LOCALIZE
+            if (isLocalized && !string.IsNullOrEmpty(localizedTerm))
+                return ResolveI2Term(localizedTerm);
+#elif AB_UNITY_LOCALIZATION
+            if (isLocalized && localizedString != null && !localizedString.IsEmpty)
+                return localizedString.GetLocalizedString();
+#endif
+            return plainText ?? "";
+        }
+
+        // ─── Operators ──────────────────────────────────────────────
+
+        public static implicit operator string(UniversalString us) => us?.ToString() ?? "";
+
+        public static bool operator ==(UniversalString us, string s) => (us?.ToString() ?? "") == s;
+        public static bool operator !=(UniversalString us, string s) => (us?.ToString() ?? "") != s;
+
+        public static bool operator ==(string s, UniversalString us) => (us?.ToString() ?? "") == s;
+        public static bool operator !=(string s, UniversalString us) => (us?.ToString() ?? "") != s;
+
+        public override bool Equals(object obj)
+        {
+            if (obj is string s) return ToString() == s;
+            if (obj is UniversalString other) return ToString() == other.ToString();
+            return false;
+        }
+
+        public override int GetHashCode() => ToString().GetHashCode();
+#if AB_I2_LOCALIZE
+        // ─── I2Localize Reflection ──────────────────────────────────
+
+        private static System.Reflection.MethodInfo _cachedGetTranslation;
+        private static bool _reflectionAttempted;
+
+        private static string ResolveI2Term(string term)
+        {
+            if (!_reflectionAttempted)
+            {
+                _reflectionAttempted = true;
+                var type = FindTypeInAllAssemblies("I2.Loc.LocalizationManager");
+                if (type != null)
+                {
+                    _cachedGetTranslation = type.GetMethod(
+                        "GetTranslation",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static,
+                        null,
+                        new Type[] { typeof(string), typeof(bool), typeof(int), typeof(bool), typeof(bool), typeof(GameObject), typeof(string), typeof(bool) },
+                        null);
+                }
+            }
+
+            if (_cachedGetTranslation != null)
+            {
+                var result = _cachedGetTranslation.Invoke(null, new object[] { term, true, 0, true, false, null, null, true }) as string;
+                if (!string.IsNullOrEmpty(result))
+                    return result;
+            }
+
+            return term; // Fallback: return raw term
+        }
+
+        private static Type FindTypeInAllAssemblies(string fullTypeName)
+        {
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var type = asm.GetType(fullTypeName);
+                if (type != null) return type;
+            }
+            return null;
+        }
+#endif
     }
 }

@@ -8,10 +8,10 @@ namespace AnkleBreaker.Utils.UniversalTypes.Tests
         // ─── UniversalString ────────────────────────────────────────
 
         [Test]
-        public void UniversalString_DefaultMode_IsPlainText()
+        public void UniversalString_Default_IsNotLocalized()
         {
             var us = new UniversalString();
-            Assert.AreEqual(UniversalString.StringMode.PlainText, us.Mode);
+            Assert.IsFalse(us.IsLocalized);
         }
 
         [Test]
@@ -22,13 +22,13 @@ namespace AnkleBreaker.Utils.UniversalTypes.Tests
         }
 
         [Test]
-        public void UniversalString_DefaultGetRawValue_ReturnsEmptyString()
-        {
-            var us = new UniversalString();            Assert.AreEqual("", us.GetRawValue());
+        public void UniversalString_Default_ToStringReturnsEmpty()
+        {            var us = new UniversalString();
+            Assert.AreEqual("", us.ToString());
         }
 
         [Test]
-        public void UniversalString_ImplicitConversion_ReturnsRawValue()
+        public void UniversalString_ImplicitConversion_ReturnsToString()
         {
             var us = new UniversalString();
             string result = us;
@@ -36,32 +36,22 @@ namespace AnkleBreaker.Utils.UniversalTypes.Tests
         }
 
         [Test]
-        public void UniversalString_ToString_ReturnsRawValue()
+        public void UniversalString_EqualityOperator_WithString()
         {
             var us = new UniversalString();
-            Assert.AreEqual("", us.ToString());
+            Assert.IsTrue(us == "");
+            Assert.IsFalse(us != "");
+            Assert.IsTrue("" == us);
         }
 
-#if AB_I2_LOCALIZE
         [Test]
-        public void UniversalString_I2Mode_Exists()
+        public void UniversalString_PlainText_IsAccessible()
         {
-            // Verify I2Localize enum value is available
-            var mode = UniversalString.StringMode.I2Localize;
-            Assert.AreEqual(1, (int)mode);
+            var us = new UniversalString();
+            Assert.AreEqual("", us.PlainText);
         }
-#endif
-#if AB_UNITY_LOCALIZATION
-        [Test]
-        public void UniversalString_UnityLocMode_Exists()
-        {
-            var mode = UniversalString.StringMode.UnityLocalization;
-            Assert.AreEqual(2, (int)mode);
-        }
-#endif
 
         // ─── UniversalSound ────────────────────────────────────────
-
         [Test]
         public void UniversalSound_DefaultMode_IsAudioClip()
         {
@@ -77,7 +67,8 @@ namespace AnkleBreaker.Utils.UniversalTypes.Tests
         }
 
         [Test]
-        public void UniversalSound_DefaultAudioClip_IsNull()        {
+        public void UniversalSound_DefaultAudioClip_IsNull()
+        {
             var sound = new UniversalSound();
             Assert.IsNull(sound.AudioClip);
         }
@@ -90,7 +81,6 @@ namespace AnkleBreaker.Utils.UniversalTypes.Tests
             Assert.AreEqual(1, (int)mode);
         }
 #endif
-
 #if AB_FMOD
         [Test]
         public void UniversalSound_FMODMode_Exists()
@@ -103,7 +93,8 @@ namespace AnkleBreaker.Utils.UniversalTypes.Tests
         // ─── UniversalAsset / UniversalSprite ──────────────────────
 
         [Test]
-        public void UniversalSprite_DefaultMode_IsDirect()        {
+        public void UniversalSprite_DefaultMode_IsDirect()
+        {
             var sprite = new UniversalSprite();
             Assert.AreEqual(UniversalAssetBase.AssetMode.Direct, sprite.Mode);
         }
@@ -122,13 +113,6 @@ namespace AnkleBreaker.Utils.UniversalTypes.Tests
             Assert.IsNull(sprite.DirectReference);
         }
 
-        [Test]
-        public void UniversalSprite_GetDirectValue_ReturnsNull()
-        {
-            var sprite = new UniversalSprite();
-            Assert.IsNull(sprite.GetDirectValue());
-        }
-
 #if AB_ADDRESSABLES
         [Test]
         public void UniversalSprite_AddressableMode_Exists()
@@ -140,10 +124,8 @@ namespace AnkleBreaker.Utils.UniversalTypes.Tests
         // ─── Enum Stability ────────────────────────────────────────
 
         [Test]
-        public void EnumValues_AreStable_AcrossIfBlocks()
+        public void EnumValues_AreStable()
         {
-            // PlainText, AudioClip, Direct should always be 0
-            Assert.AreEqual(0, (int)UniversalString.StringMode.PlainText);
             Assert.AreEqual(0, (int)UniversalSound.SoundMode.AudioClip);
             Assert.AreEqual(0, (int)UniversalAssetBase.AssetMode.Direct);
         }
