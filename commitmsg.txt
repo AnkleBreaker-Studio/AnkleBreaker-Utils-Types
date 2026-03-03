@@ -1,6 +1,0 @@
-[FEAT] UniversalString, universal string type supporting PlainText, i2Localize term, Unity Localization (table + entry)
-[FEAT] UniversalAsset<T>, generic asset reference supporting Direct reference and Addressable key
-[FEAT] UniversalSprite, convenience alias for UniversalAsset<Sprite>
-[FEAT] UniversalSound, universal sound reference supporting AudioClip, Wwise event name, FMOD event path
-[FEAT] PropertyDrawers, custom drawers with mode dropdown and contextual fields for all types
-[FEAT] Package setup, package.json, asmdef (runtime + editor + tests), versionDefines for Unity Localization and Addressables
