@@ -1,0 +1,12 @@
+# Unity meta files are tracked (required for package)
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vs/
+*.csproj
+*.sln
+*.user
+*.suo

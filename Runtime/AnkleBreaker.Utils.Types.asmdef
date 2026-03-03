@@ -1,0 +1,25 @@
+{
+    "name": "AnkleBreaker.Utils.Types",
+    "rootNamespace": "AnkleBreaker.Utils.Types",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.localization",
+            "expression": "",
+            "define": "AB_UNITY_LOCALIZATION"
+        },
+        {
+            "name": "com.unity.addressables",
+            "expression": "",
+            "define": "AB_ADDRESSABLES"
+        }
+    ],
+    "noEngineReferences": false
+}
