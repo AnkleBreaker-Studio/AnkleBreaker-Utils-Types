@@ -1,7 +1,7 @@
 {
-  "name": "com.anklebreaker-studio.utils.types",
+  "name": "com.anklebreaker-studio.utils.universaltypes",
   "version": "1.0.0",
-  "displayName": "AnkleBreaker-studio Utils Types",
+  "displayName": "AnkleBreaker-studio Utils UniversalTypes",
   "description": "Universal wrapper types for Unity Inspector. Provides UniversalString (plain text, i2Localize, Unity Localization), UniversalAsset<T> (direct reference or Addressable), and UniversalSound (AudioClip, Wwise, FMOD).",
   "unity": "2022.3",
   "author": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AnkleBreaker-Studio/AnkleBreaker-Utils-Types.git"
+    "url": "https://github.com/AnkleBreaker-Studio/AnkleBreaker-Utils-UniversalTypes.git"
   },
   "keywords": [
     "universal",

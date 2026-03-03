@@ -1,7 +1,7 @@
 using NUnit.Framework;
-using AnkleBreaker.Utils.Types;
+using AnkleBreaker.Utils.UniversalTypes;
 
-namespace AnkleBreaker.Utils.Types.Tests
+namespace AnkleBreaker.Utils.UniversalTypes.Tests
 {
     public class UniversalTypesTests
     {

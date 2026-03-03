@@ -1,6 +1,6 @@
 {
-    "name": "AnkleBreaker.Utils.Types",
-    "rootNamespace": "AnkleBreaker.Utils.Types",
+    "name": "AnkleBreaker.Utils.UniversalTypes",
+    "rootNamespace": "AnkleBreaker.Utils.UniversalTypes",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

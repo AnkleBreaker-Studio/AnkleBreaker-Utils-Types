@@ -1,8 +1,8 @@
 {
-    "name": "AnkleBreaker.Utils.Types.Editor",
-    "rootNamespace": "AnkleBreaker.Utils.Types.Editor",
+    "name": "AnkleBreaker.Utils.UniversalTypes.Editor",
+    "rootNamespace": "AnkleBreaker.Utils.UniversalTypes.Editor",
     "references": [
-        "AnkleBreaker.Utils.Types"
+        "AnkleBreaker.Utils.UniversalTypes"
     ],
     "includePlatforms": [
         "Editor"

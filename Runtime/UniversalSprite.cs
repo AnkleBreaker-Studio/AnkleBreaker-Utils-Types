@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace AnkleBreaker.Utils.Types
+namespace AnkleBreaker.Utils.UniversalTypes
 {
     /// <summary>
     /// Universal sprite reference. Supports direct Sprite reference or Addressable key.

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace AnkleBreaker.Utils.Types
+namespace AnkleBreaker.Utils.UniversalTypes
 {
     /// <summary>
     /// Universal sound reference that supports AudioClip, Wwise events, and FMOD events.

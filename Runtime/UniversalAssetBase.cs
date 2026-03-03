@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace AnkleBreaker.Utils.Types
+namespace AnkleBreaker.Utils.UniversalTypes
 {
     /// <summary>
     /// Base class for UniversalAsset&lt;T&gt;. Provides shared mode and addressable key fields.

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace AnkleBreaker.Utils.Types
+namespace AnkleBreaker.Utils.UniversalTypes
 {
     /// <summary>
     /// Universal string type that supports plain text, i2Localize terms, and Unity Localization entries.

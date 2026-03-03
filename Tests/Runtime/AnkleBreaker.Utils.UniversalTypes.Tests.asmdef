@@ -1,8 +1,8 @@
 {
-    "name": "AnkleBreaker.Utils.Types.Tests",
-    "rootNamespace": "AnkleBreaker.Utils.Types.Tests",
+    "name": "AnkleBreaker.Utils.UniversalTypes.Tests",
+    "rootNamespace": "AnkleBreaker.Utils.UniversalTypes.Tests",
     "references": [
-        "AnkleBreaker.Utils.Types",
+        "AnkleBreaker.Utils.UniversalTypes",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

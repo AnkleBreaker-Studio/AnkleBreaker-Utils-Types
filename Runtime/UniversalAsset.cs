@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace AnkleBreaker.Utils.Types
+namespace AnkleBreaker.Utils.UniversalTypes
 {
     /// <summary>
     /// Universal asset reference that supports both direct references and Addressable keys.

@@ -69,7 +69,7 @@ switch (clickSound.Mode)
 Add to your Unity project's `Packages/manifest.json`:
 
 ```json
-"com.anklebreaker-studio.utils.types": "https://github.com/AnkleBreaker-Studio/AnkleBreaker-Utils-Types.git#Release"
+"com.anklebreaker-studio.utils.universaltypes": "https://github.com/AnkleBreaker-Studio/AnkleBreaker-Utils-UniversalTypes.git#Release"
 ```
 
 ## Requirements

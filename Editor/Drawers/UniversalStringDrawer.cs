@@ -1,8 +1,8 @@
 using UnityEditor;
 using UnityEngine;
-using AnkleBreaker.Utils.Types;
+using AnkleBreaker.Utils.UniversalTypes;
 
-namespace AnkleBreaker.Utils.Types.Editor
+namespace AnkleBreaker.Utils.UniversalTypes.Editor
 {
     [CustomPropertyDrawer(typeof(UniversalString))]
     public class UniversalStringDrawer : PropertyDrawer
