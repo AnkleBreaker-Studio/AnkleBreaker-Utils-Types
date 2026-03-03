@@ -1,17 +1,30 @@
 using System;
 using UnityEngine;
+#if AB_ADDRESSABLES
+using UnityEngine.AddressableAssets;
+#endif
 
 namespace AnkleBreaker.Utils.UniversalTypes
 {
     /// <summary>
-    /// Universal asset reference that supports both direct references and Addressable keys.
-    /// For Addressable mode, use AddressableKey with Addressables.LoadAssetAsync&lt;T&gt;().
+    /// Universal asset reference that supports direct references and Addressable keys.
+    /// Addressable mode is only available when com.unity.addressables is installed.
     /// </summary>
     /// <typeparam name="T">The asset type (must inherit from UnityEngine.Object).</typeparam>
     [Serializable]
     public class UniversalAsset<T> : UniversalAssetBase where T : UnityEngine.Object
     {
         [SerializeField] private T directReference;
+
+#if AB_ADDRESSABLES
+        [SerializeField] private AssetReference addressableRef;
+
+        /// <summary>
+        /// Addressable asset reference. Use with Addressables.LoadAssetAsync&lt;T&gt;().
+        /// Only available when com.unity.addressables is installed.
+        /// </summary>
+        public AssetReference AddressableReference => addressableRef;
+#endif
 
         // ─── Properties ─────────────────────────────────────────────
 
@@ -20,7 +33,7 @@ namespace AnkleBreaker.Utils.UniversalTypes
 
         /// <summary>
         /// Returns the direct reference if mode is Direct, null otherwise.
-        /// For Addressable mode, use AddressableKey with Addressables.LoadAssetAsync&lt;T&gt;().
+        /// For Addressable mode, use AddressableReference with Addressables.LoadAssetAsync&lt;T&gt;().
         /// </summary>
         public T GetDirectValue()
         {
@@ -35,8 +48,10 @@ namespace AnkleBreaker.Utils.UniversalTypes
                 {
                     case AssetMode.Direct:
                         return directReference == null;
+#if AB_ADDRESSABLES
                     case AssetMode.Addressable:
-                        return string.IsNullOrEmpty(AddressableKey);
+                        return addressableRef == null || !addressableRef.RuntimeKeyIsValid();
+#endif
                     default:
                         return true;
                 }

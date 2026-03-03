@@ -2,7 +2,11 @@
     "name": "AnkleBreaker.Utils.UniversalTypes.Editor",
     "rootNamespace": "AnkleBreaker.Utils.UniversalTypes.Editor",
     "references": [
-        "AnkleBreaker.Utils.UniversalTypes"
+        "AnkleBreaker.Utils.UniversalTypes",
+        "AK.Wwise.Unity.API.WwiseTypes",
+        "AK.Wwise.Unity.API",
+        "FMODUnity",
+        "Unity.Addressables"
     ],
     "includePlatforms": [
         "Editor"

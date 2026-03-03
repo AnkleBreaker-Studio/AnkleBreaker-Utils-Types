@@ -7,7 +7,9 @@ namespace AnkleBreaker.Utils.UniversalTypes.Editor
     [CustomPropertyDrawer(typeof(UniversalAssetBase), true)]
     public class UniversalAssetBaseDrawer : PropertyDrawer
     {
-        private const float ModeWidth = 100f;
+#if AB_ADDRESSABLES
+        private const float ModeWidth = 110f;
+#endif
         private const float Spacing = 2f;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -19,10 +21,11 @@ namespace AnkleBreaker.Utils.UniversalTypes.Editor
         {
             EditorGUI.BeginProperty(position, label, property);
 
-            var modeProp = property.FindPropertyRelative("mode");
             var directRefProp = property.FindPropertyRelative("directReference");
-            var addressableKeyProp = property.FindPropertyRelative("addressableKey");
 
+#if AB_ADDRESSABLES
+            var modeProp = property.FindPropertyRelative("mode");
+            var addressableRefProp = property.FindPropertyRelative("addressableRef");
             var mode = (UniversalAssetBase.AssetMode)modeProp.enumValueIndex;
 
             // Label
@@ -46,14 +49,20 @@ namespace AnkleBreaker.Utils.UniversalTypes.Editor
                 case UniversalAssetBase.AssetMode.Direct:
                     if (directRefProp != null)
                         EditorGUI.PropertyField(valueRect, directRefProp, GUIContent.none);
-                    else
-                        EditorGUI.LabelField(valueRect, "(no direct reference field)");
                     break;
 
                 case UniversalAssetBase.AssetMode.Addressable:
-                    addressableKeyProp.stringValue = EditorGUI.TextField(valueRect, addressableKeyProp.stringValue);
+                    if (addressableRefProp != null)
+                        EditorGUI.PropertyField(valueRect, addressableRefProp, GUIContent.none);
                     break;
             }
+#else
+            // Without Addressables, just show the direct reference field normally
+            if (directRefProp != null)
+                EditorGUI.PropertyField(position, directRefProp, label);
+            else
+                EditorGUI.LabelField(position, label, new GUIContent("(no direct reference field)"));
+#endif
 
             EditorGUI.EndProperty();
         }

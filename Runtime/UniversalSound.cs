@@ -1,11 +1,14 @@
 using System;
 using UnityEngine;
+#if AB_FMOD
+using FMODUnity;
+#endif
 
 namespace AnkleBreaker.Utils.UniversalTypes
 {
     /// <summary>
-    /// Universal sound reference that supports AudioClip, Wwise events, and FMOD events.
-    /// Stores data for each audio system without requiring compile-time dependencies.
+    /// Universal sound reference supporting AudioClip, Wwise events, and FMOD events.
+    /// Available modes depend on which audio middleware is installed.
     /// 
     /// Usage example:
     /// <code>
@@ -14,12 +17,16 @@ namespace AnkleBreaker.Utils.UniversalTypes
     ///     case UniversalSound.SoundMode.AudioClip:
     ///         audioSource.PlayOneShot(mySound.AudioClip);
     ///         break;
+    /// #if AB_WWISE
     ///     case UniversalSound.SoundMode.Wwise:
-    ///         // AkSoundEngine.PostEvent(mySound.WwiseEventName, gameObject);
+    ///         mySound.WwiseEvent.Post(gameObject);
     ///         break;
+    /// #endif
+    /// #if AB_FMOD
     ///     case UniversalSound.SoundMode.FMOD:
-    ///         // RuntimeManager.PlayOneShot(mySound.FMODEventPath);
+    ///         RuntimeManager.PlayOneShot(mySound.FMODEvent);
     ///         break;
+    /// #endif
     /// }
     /// </code>
     /// </summary>
@@ -28,26 +35,40 @@ namespace AnkleBreaker.Utils.UniversalTypes
     {
         public enum SoundMode
         {
-            AudioClip,
-            Wwise,
-            FMOD
+            AudioClip = 0,
+#if AB_WWISE
+            Wwise = 1,
+#endif
+#if AB_FMOD
+            FMOD = 2,
+#endif
         }
 
         [SerializeField] private SoundMode mode = SoundMode.AudioClip;
         [SerializeField] private AudioClip audioClip;
 
-        /// <summary>Wwise event name (e.g. "Play_UI_Click").</summary>
-        [SerializeField] private string wwiseEventName = "";
+#if AB_WWISE
+        [SerializeField] private AK.Wwise.Event wwiseEvent;
+#endif
 
-        /// <summary>FMOD event path (e.g. "event:/UI/Click").</summary>
-        [SerializeField] private string fmodEventPath = "";
+#if AB_FMOD
+        [SerializeField] private EventReference fmodEvent;
+#endif
 
         // ─── Properties ─────────────────────────────────────────────
 
         public SoundMode Mode => mode;
         public AudioClip AudioClip => audioClip;
-        public string WwiseEventName => wwiseEventName;
-        public string FMODEventPath => fmodEventPath;
+
+#if AB_WWISE
+        /// <summary>Wwise Event reference. Call .Post(gameObject) to play.</summary>
+        public AK.Wwise.Event WwiseEvent => wwiseEvent;
+#endif
+
+#if AB_FMOD
+        /// <summary>FMOD Event reference. Use with RuntimeManager.PlayOneShot().</summary>
+        public EventReference FMODEvent => fmodEvent;
+#endif
 
         /// <summary>
         /// Returns true if no value is assigned for the current mode.
@@ -60,10 +81,14 @@ namespace AnkleBreaker.Utils.UniversalTypes
                 {
                     case SoundMode.AudioClip:
                         return audioClip == null;
+#if AB_WWISE
                     case SoundMode.Wwise:
-                        return string.IsNullOrEmpty(wwiseEventName);
+                        return wwiseEvent == null || !wwiseEvent.IsValid();
+#endif
+#if AB_FMOD
                     case SoundMode.FMOD:
-                        return string.IsNullOrEmpty(fmodEventPath);
+                        return fmodEvent.IsNull;
+#endif
                     default:
                         return true;
                 }
