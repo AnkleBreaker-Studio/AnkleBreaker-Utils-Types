@@ -1,6 +1,6 @@
 {
   "name": "com.anklebreaker-studio.utils.universaltypes",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "AnkleBreaker-studio Utils UniversalTypes",
   "description": "Universal wrapper types for Unity Inspector. Provides UniversalString (plain text, i2Localize, Unity Localization), UniversalAsset<T> (direct reference or Addressable), and UniversalSound (AudioClip, Wwise, FMOD).",
   "unity": "2022.3",

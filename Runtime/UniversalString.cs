@@ -19,10 +19,45 @@ namespace AnkleBreaker.Utils.UniversalTypes
         [SerializeField] private string plainText = "";
 
 #if AB_I2_LOCALIZE
-        [SerializeField] private string localizedTerm = "";
-#elif AB_UNITY_LOCALIZATION
-        [SerializeField] private UnityEngine.Localization.LocalizedString localizedString;
+        [SerializeField] private I2.Loc.LocalizedString i2LocalizedString;
 #endif
+
+#if AB_UNITY_LOCALIZATION
+        [SerializeField] private UnityEngine.Localization.LocalizedString unityLocalizedString;
+#endif
+
+        // ─── Constructors ───────────────────────────────────────────
+
+        /// <summary>Default constructor. Creates an empty plain text string.</summary>
+        public UniversalString()
+        {
+            plainText = "";
+        }
+
+        /// <summary>Creates a UniversalString from plain text.</summary>
+        public UniversalString(string text)
+        {
+            plainText = text ?? "";
+        }
+
+#if AB_I2_LOCALIZE
+        /// <summary>Creates a UniversalString from an I2 LocalizedString.</summary>
+        public UniversalString(I2.Loc.LocalizedString localized)
+        {
+            isLocalized = true;
+            i2LocalizedString = localized;
+        }
+#endif
+
+#if AB_UNITY_LOCALIZATION
+        /// <summary>Creates a UniversalString from a Unity LocalizedString.</summary>
+        public UniversalString(UnityEngine.Localization.LocalizedString localized)
+        {
+            isLocalized = true;
+            unityLocalizedString = localized;
+        }
+#endif
+
         // ─── Properties ─────────────────────────────────────────────
 
         /// <summary>True if this string is in localized mode.</summary>
@@ -42,21 +77,37 @@ namespace AnkleBreaker.Utils.UniversalTypes
         public string PlainText => plainText;
 
 #if AB_I2_LOCALIZE
-        /// <summary>The I2Localize term key.</summary>
-        public string LocalizedTerm => localizedTerm;
-#elif AB_UNITY_LOCALIZATION
-        /// <summary>The Unity Localization LocalizedString reference.</summary>
-        public UnityEngine.Localization.LocalizedString LocalizedString => localizedString;
+        /// <summary>The I2 Localization LocalizedString.</summary>
+        public I2.Loc.LocalizedString I2LocalizedString => i2LocalizedString;
 #endif
+
+#if AB_UNITY_LOCALIZATION
+        /// <summary>The Unity Localization LocalizedString reference.</summary>
+        public UnityEngine.Localization.LocalizedString UnityLocalizedString => unityLocalizedString;
+#endif
+
         /// <summary>True if the current value is null or empty.</summary>
         public bool IsEmpty
         {
             get
             {
+#if AB_I2_LOCALIZE || AB_UNITY_LOCALIZATION
+                if (isLocalized)
+                {
 #if AB_I2_LOCALIZE
-                if (isLocalized) return string.IsNullOrEmpty(localizedTerm);
+                    if (string.IsNullOrEmpty(i2LocalizedString.mTerm))
+                    {
+#if AB_UNITY_LOCALIZATION
+                        return unityLocalizedString == null || unityLocalizedString.IsEmpty;
+#else
+                        return true;
+#endif
+                    }
+                    return false;
 #elif AB_UNITY_LOCALIZATION
-                if (isLocalized) return localizedString == null || localizedString.IsEmpty;
+                    return unityLocalizedString == null || unityLocalizedString.IsEmpty;
+#endif
+                }
 #endif
                 return string.IsNullOrEmpty(plainText);
             }
@@ -66,24 +117,39 @@ namespace AnkleBreaker.Utils.UniversalTypes
 
         /// <summary>
         /// Resolves and returns the string value.
-        /// For localized mode: I2Localize resolves via reflection, Unity Localization via API.
+        /// Priority: I2Localize > Unity Localization > Plain Text.
         /// Falls back to raw term/key if translation fails.
         /// </summary>
         public override string ToString()
         {
+#if AB_I2_LOCALIZE || AB_UNITY_LOCALIZATION
+            if (isLocalized)
+            {
 #if AB_I2_LOCALIZE
-            if (isLocalized && !string.IsNullOrEmpty(localizedTerm))
-                return ResolveI2Term(localizedTerm);
-#elif AB_UNITY_LOCALIZATION
-            if (isLocalized && localizedString != null && !localizedString.IsEmpty)
-                return localizedString.GetLocalizedString();
+                if (!string.IsNullOrEmpty(i2LocalizedString.mTerm))
+                {
+                    string i2Result = i2LocalizedString.ToString();
+                    if (!string.IsNullOrEmpty(i2Result))
+                        return i2Result;
+                }
+#endif
+
+#if AB_UNITY_LOCALIZATION
+                if (unityLocalizedString != null && !unityLocalizedString.IsEmpty)
+                    return unityLocalizedString.GetLocalizedString();
+#endif
+            }
 #endif
             return plainText ?? "";
         }
 
         // ─── Operators ──────────────────────────────────────────────
 
+        /// <summary>Implicit conversion to string. Returns the resolved value.</summary>
         public static implicit operator string(UniversalString us) => us?.ToString() ?? "";
+
+        /// <summary>Implicit conversion from string. Creates a plain text UniversalString.</summary>
+        public static implicit operator UniversalString(string s) => new UniversalString(s);
 
         public static bool operator ==(UniversalString us, string s) => (us?.ToString() ?? "") == s;
         public static bool operator !=(UniversalString us, string s) => (us?.ToString() ?? "") != s;
@@ -99,48 +165,5 @@ namespace AnkleBreaker.Utils.UniversalTypes
         }
 
         public override int GetHashCode() => ToString().GetHashCode();
-#if AB_I2_LOCALIZE
-        // ─── I2Localize Reflection ──────────────────────────────────
-
-        private static System.Reflection.MethodInfo _cachedGetTranslation;
-        private static bool _reflectionAttempted;
-
-        private static string ResolveI2Term(string term)
-        {
-            if (!_reflectionAttempted)
-            {
-                _reflectionAttempted = true;
-                var type = FindTypeInAllAssemblies("I2.Loc.LocalizationManager");
-                if (type != null)
-                {
-                    _cachedGetTranslation = type.GetMethod(
-                        "GetTranslation",
-                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static,
-                        null,
-                        new Type[] { typeof(string), typeof(bool), typeof(int), typeof(bool), typeof(bool), typeof(GameObject), typeof(string), typeof(bool) },
-                        null);
-                }
-            }
-
-            if (_cachedGetTranslation != null)
-            {
-                var result = _cachedGetTranslation.Invoke(null, new object[] { term, true, 0, true, false, null, null, true }) as string;
-                if (!string.IsNullOrEmpty(result))
-                    return result;
-            }
-
-            return term; // Fallback: return raw term
-        }
-
-        private static Type FindTypeInAllAssemblies(string fullTypeName)
-        {
-            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var type = asm.GetType(fullTypeName);
-                if (type != null) return type;
-            }
-            return null;
-        }
-#endif
     }
 }

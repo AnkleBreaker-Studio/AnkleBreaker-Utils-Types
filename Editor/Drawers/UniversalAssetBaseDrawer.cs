@@ -8,7 +8,7 @@ namespace AnkleBreaker.Utils.UniversalTypes.Editor
     public class UniversalAssetBaseDrawer : PropertyDrawer
     {
 #if AB_ADDRESSABLES
-        private const float ModeWidth = 110f;
+        private const float ModeWidth = 90f;
 #endif
         private const float Spacing = 2f;
 

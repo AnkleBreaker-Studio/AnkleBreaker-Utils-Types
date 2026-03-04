@@ -5,7 +5,9 @@
         "AK.Wwise.Unity.API.WwiseTypes",
         "AK.Wwise.Unity.API",
         "FMODUnity",
-        "Unity.Addressables"
+        "Unity.Addressables",
+        "I2.Loc",
+        "Unity.Localization"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

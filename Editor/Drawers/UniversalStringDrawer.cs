@@ -38,7 +38,8 @@ namespace AnkleBreaker.Utils.UniversalTypes.Editor
             Rect locLabelRect = new Rect(fieldX + ToggleWidth, position.y, LabelLocWidth, EditorGUIUtility.singleLineHeight);
             var miniStyle = new GUIStyle(EditorStyles.miniLabel) { alignment = TextAnchor.MiddleLeft };
             EditorGUI.LabelField(locLabelRect, "Localized", miniStyle);
-            // Value field (rest of the line after toggle + label)
+
+            // Value field
             float valueX = fieldX + ToggleWidth + LabelLocWidth + Spacing;
             float valueWidth = fieldWidth - ToggleWidth - LabelLocWidth - Spacing;
             Rect valueRect = new Rect(valueX, position.y, valueWidth, EditorGUIUtility.singleLineHeight);
@@ -50,12 +51,11 @@ namespace AnkleBreaker.Utils.UniversalTypes.Editor
             else
             {
 #if AB_I2_LOCALIZE
-                var termProp = property.FindPropertyRelative("localizedTerm");
-                termProp.stringValue = EditorGUI.TextField(valueRect, termProp.stringValue);
-                if (string.IsNullOrEmpty(termProp.stringValue))
-                    DrawPlaceholder(valueRect, "I2 Term (e.g. UI/Title)");
+                // Draw using I2L's native LocalizedStringDrawer (popup with term selection)
+                var i2Prop = property.FindPropertyRelative("i2LocalizedString");
+                EditorGUI.PropertyField(valueRect, i2Prop, GUIContent.none);
 #elif AB_UNITY_LOCALIZATION
-                var locStringProp = property.FindPropertyRelative("localizedString");
+                var locStringProp = property.FindPropertyRelative("unityLocalizedString");
                 EditorGUI.PropertyField(valueRect, locStringProp, GUIContent.none);
 #endif
             }
@@ -65,14 +65,6 @@ namespace AnkleBreaker.Utils.UniversalTypes.Editor
 #endif
 
             EditorGUI.EndProperty();
-        }
-
-        private static void DrawPlaceholder(Rect rect, string placeholder)
-        {
-            var style = new GUIStyle(EditorStyles.label);
-            style.normal.textColor = new Color(0.5f, 0.5f, 0.5f, 0.6f);
-            style.fontStyle = FontStyle.Italic;
-            EditorGUI.LabelField(rect, placeholder, style);
         }
     }
 }

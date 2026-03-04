@@ -22,7 +22,7 @@ namespace AnkleBreaker.Utils.UniversalTypes.Editor
             }
         }
 
-        private const float ModeWidth = 100f;
+        private const float ModeWidth = 85f;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {

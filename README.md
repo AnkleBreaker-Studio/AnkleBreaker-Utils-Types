@@ -1,4 +1,4 @@
-# AnkleBreaker Utils Types
+# AnkleBreaker Utils UniversalTypes
 
 Universal wrapper types for Unity Inspector. Drop-in serializable fields that let users choose between multiple backends without changing code.
 
@@ -9,16 +9,23 @@ Universal wrapper types for Unity Inspector. Drop-in serializable fields that le
 A string field that supports multiple text sources:
 
 - **PlainText** — Raw string value
-- **I2Localize** — i2Localize term key (resolved via `I2.Loc.LocalizationManager.GetTranslation()`)
-- **Unity Localization** — Table name + entry key (resolved via Unity Localization package)
+- **I2Localize** — `I2.Loc.LocalizedString` (resolved via I2L natively)
+- **Unity Localization** — `UnityEngine.Localization.LocalizedString` (resolved via Unity Localization package)
+
+Priority when both localization packages are present: **I2L > Unity Localization > PlainText**.
 
 ```csharp
 [SerializeField] private UniversalString title;
 
-// Access
-string raw = title.GetRawValue();
-// Or use implicit conversion
+// Implicit conversion to string (resolves localization automatically)
 string text = title;
+
+// Or explicit ToString()
+Debug.Log(title.ToString());
+
+// Create from code
+UniversalString plain = "Hello World";
+UniversalString fromCode = new UniversalString("Some text");
 ```
 
 ### UniversalAsset\<T\>
@@ -26,7 +33,7 @@ string text = title;
 A generic asset reference with two modes:
 
 - **Direct** — Standard Unity object reference
-- **Addressable** — String key for `Addressables.LoadAssetAsync<T>()`
+- **Addressable** — `AssetReference` for `Addressables.LoadAssetAsync<T>()`
 
 ```csharp
 [SerializeField] private UniversalSprite icon; // alias for UniversalAsset<Sprite>
@@ -35,8 +42,7 @@ A generic asset reference with two modes:
 Sprite sprite = icon.DirectReference;
 
 // Addressable mode
-string key = icon.AddressableKey;
-// var handle = Addressables.LoadAssetAsync<Sprite>(key);
+var handle = Addressables.LoadAssetAsync<Sprite>(icon.AddressableReference);
 ```
 
 ### UniversalSound
@@ -44,8 +50,8 @@ string key = icon.AddressableKey;
 A sound reference supporting multiple audio middleware:
 
 - **AudioClip** — Standard Unity AudioClip
-- **Wwise** — Wwise event name string
-- **FMOD** — FMOD event path string
+- **Wwise** — `AK.Wwise.Event`
+- **FMOD** — `FMODUnity.EventReference`
 
 ```csharp
 [SerializeField] private UniversalSound clickSound;
@@ -55,12 +61,16 @@ switch (clickSound.Mode)
     case UniversalSound.SoundMode.AudioClip:
         audioSource.PlayOneShot(clickSound.AudioClip);
         break;
+#if AB_WWISE
     case UniversalSound.SoundMode.Wwise:
-        // AkSoundEngine.PostEvent(clickSound.WwiseEventName, gameObject);
+        clickSound.WwiseEvent.Post(gameObject);
         break;
+#endif
+#if AB_FMOD
     case UniversalSound.SoundMode.FMOD:
-        // RuntimeManager.PlayOneShot(clickSound.FMODEventPath);
+        RuntimeManager.PlayOneShot(clickSound.FMODEvent);
         break;
+#endif
 }
 ```
 
@@ -72,11 +82,29 @@ Add to your Unity project's `Packages/manifest.json`:
 "com.anklebreaker-studio.utils.universaltypes": "https://github.com/AnkleBreaker-Studio/AnkleBreaker-Utils-UniversalTypes.git#Release"
 ```
 
+## I2 Localization Setup
+
+If you use **I2 Localization** (Asset Store version without asmdef), the package will detect it automatically on first import and offer to create the required Assembly Definitions (`I2.Loc.asmdef` + `I2.Loc.Editor.asmdef`).
+
+You can also trigger this manually via: **AnkleBreaker > UniversalTypes > Create I2L Assembly Definitions**
+
+This is required for `UniversalString` to reference `I2.Loc.LocalizedString` directly.
+
 ## Requirements
 
 - Unity 2022.3+
 - No required dependencies — works standalone
-- Optional: i2Localize, Unity Localization, Addressables, Wwise, FMOD
+- Optional: I2 Localization, Unity Localization, Addressables, Wwise, FMOD
+
+## Scripting Defines (auto-detected)
+
+| Define | Source |
+|---|---|
+| `AB_I2_LOCALIZE` | I2 Localization detected (via DefineManager) |
+| `AB_UNITY_LOCALIZATION` | `com.unity.localization` installed (via versionDefines) |
+| `AB_ADDRESSABLES` | `com.unity.addressables` installed (via versionDefines) |
+| `AB_WWISE` | Wwise SDK detected (via DefineManager) |
+| `AB_FMOD` | FMOD SDK detected (via DefineManager) |
 
 ## License
 
