@@ -1,4 +1,7 @@
-# AnkleBreaker Utils UniversalTypes
+# AnkleBreaker Studio - Utils UniversalTypes
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-AnkleBreaker%20Studio-red?logo=github)](https://github.com/sponsors/AnkleBreaker-Studio)
+[![Asset Store](https://img.shields.io/badge/Asset%20Store-AnkleBreaker%20Studio-blue)](https://assetstore.unity.com/publishers/101837)
 
 Universal wrapper types for Unity Inspector. Drop-in serializable fields that let users choose between multiple backends without changing code.
 
@@ -76,10 +79,10 @@ switch (clickSound.Mode)
 
 ## Installation
 
-Add to your Unity project's `Packages/manifest.json`:
+Add via Unity Package Manager using the Git URL:
 
-```json
-"com.anklebreaker-studio.utils.universaltypes": "https://github.com/AnkleBreaker-Studio/AnkleBreaker-Utils-UniversalTypes.git#Release"
+```
+https://github.com/AnkleBreaker-Studio/AnkleBreaker-Utils-UniversalTypes.git#Release
 ```
 
 ## I2 Localization Setup
@@ -92,7 +95,7 @@ This is required for `UniversalString` to reference `I2.Loc.LocalizedString` dir
 
 ## Requirements
 
-- Unity 2022.3+
+- Unity 2022.3 LTS or later
 - No required dependencies — works standalone
 - Optional: I2 Localization, Unity Localization, Addressables, Wwise, FMOD
 
@@ -108,4 +111,4 @@ This is required for `UniversalString` to reference `I2.Loc.LocalizedString` dir
 
 ## License
 
-MIT
+See [LICENSE.md](LICENSE.md)
