@@ -1,9 +1,13 @@
-# AnkleBreaker Studio - Utils UniversalTypes
+<p align="center">
+  <img src="docs/universal-types.gif" alt="AnkleBreaker UniversalTypes — Universal wrapper types for Unity Inspector" width="800" />
+</p>
+
+# AnkleBreaker Utils UniversalTypes — Universal Wrapper Types for Unity
+
+> **Drop-in serializable fields that let users choose between multiple backends without changing code.** UniversalString (I2L + Unity Localization), UniversalAsset (Direct + Addressables), UniversalSound (AudioClip + Wwise + FMOD). UPM-ready, zero required dependencies. Free and open source by [AnkleBreaker Studio](https://github.com/AnkleBreaker-Studio).
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-AnkleBreaker%20Studio-red?logo=github)](https://github.com/sponsors/AnkleBreaker-Studio)
 [![Asset Store](https://img.shields.io/badge/Asset%20Store-AnkleBreaker%20Studio-blue)](https://assetstore.unity.com/publishers/101837)
-
-Universal wrapper types for Unity Inspector. Drop-in serializable fields that let users choose between multiple backends without changing code.
 
 ## Types
 
@@ -91,8 +95,6 @@ If you use **I2 Localization** (Asset Store version without asmdef), the package
 
 You can also trigger this manually via: **AnkleBreaker > UniversalTypes > Create I2L Assembly Definitions**
 
-This is required for `UniversalString` to reference `I2.Loc.LocalizedString` directly.
-
 ## Requirements
 
 - Unity 2022.3 LTS or later
@@ -108,6 +110,16 @@ This is required for `UniversalString` to reference `I2.Loc.LocalizedString` dir
 | `AB_ADDRESSABLES` | `com.unity.addressables` installed (via versionDefines) |
 | `AB_WWISE` | Wwise SDK detected (via DefineManager) |
 | `AB_FMOD` | FMOD SDK detected (via DefineManager) |
+
+## Part of the AnkleBreaker Ecosystem
+
+| Package | Description |
+|---------|-------------|
+| [AnkleBreaker-Core](https://github.com/AnkleBreaker-Studio/AnkleBreaker-Core) | Base classes, interfaces, delegates |
+| [Utils-Inspector](https://github.com/AnkleBreaker-Studio/AnkleBreaker-Utils-Inspector) | 40+ custom inspector attributes (free Odin alternative) |
+| [Utils-Extensions](https://github.com/AnkleBreaker-Studio/AnkleBreaker-Utils-Extensions) | 50+ C# extension methods for Unity |
+| **Utils-UniversalTypes** (this) | Universal wrappers for localization, assets, audio |
+| [Unity MCP](https://github.com/AnkleBreaker-Studio/unity-mcp-server) | 268 AI tools for Unity Editor control |
 
 ## License
 
