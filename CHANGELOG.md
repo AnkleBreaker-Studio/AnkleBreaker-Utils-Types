@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.2.0] - 2026-04-01
+
+### Changed
+
+- **DefineManager**: Replace local `UniversalTypesDefineManager` with declarative `[assembly: ABDefine(...)]` attributes from AnkleBreaker.Core
+- Add `com.anklebreaker-studio.core` (>= 1.1.0) as dependency
+- Add `AnkleBreaker.Core.Editor` assembly reference in Editor asmdef
+
+### Added
+
+- `Editor/AssemblyInfo.cs` — Declares `AB_WWISE`, `AB_FMOD`, `AB_I2_LOCALIZE` via `[assembly: ABDefine(...)]`
+
+### Removed
+
+- `Editor/DefineManager/UniversalTypesDefineManager.cs` — Replaced by Core's `ABDefineManager`
+
 ## [1.1.0] - 2026-03-04
 
 ### Changed
